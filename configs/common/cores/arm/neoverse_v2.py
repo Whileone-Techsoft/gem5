@@ -283,15 +283,20 @@ class NeoverseV2_BP(BranchPredictor):
 
 
 class NeoverseMMU(ArmMMU):
+    # Redefining itb/dtb replaces ArmMMU's, so next_level must be set again:
+    # without it the L2 TLB below is never looked up and every L1 TLB miss
+    # goes to the table walker.
     itb = ArmTLB(
         entry_type="instruction",
         size=48,
         assoc=12,
+        next_level=Parent.l2_shared,
     )
     dtb = ArmTLB(
         entry_type="data",
         size=48,
         assoc=48,
+        next_level=Parent.l2_shared,
     )
     l2_shared = ArmTLB(
         entry_type="unified", size=2048, assoc=8, partial_levels=["L2"]
